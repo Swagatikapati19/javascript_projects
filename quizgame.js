@@ -6,16 +6,13 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-let interval;
-let questionAnswered = false; // Track if the question was answered or skipped
 let invalidAttempts = 0; // Track the number of invalid inputs
-
-// Max allowed invalid attempts
-const MAX_INVALID_ATTEMPTS = 3;
+const MAX_INVALID_ATTEMPTS = 3; // Max allowed invalid attempts
 
 // Questions and answers for each difficulty level
 const levels = {
   easy: [
+    // Define easy questions
     {
       question: "What is the capital of France?",
       options: ["A. Paris", "B. London", "C. Rome", "D. Madrid"],
@@ -43,6 +40,7 @@ const levels = {
     }
   ],
   medium: [
+    // Define medium questions
     {
       question: "What is the currency in China?",
       options: ["A. Yen", "B. Won", "C. Renminbi Yuan", "D. Baht"],
@@ -70,6 +68,7 @@ const levels = {
     }
   ],
   high: [
+    // Define high questions
     {
       question: "Who is credited with developing the general theory of relativity?",
       options: ["A. Niels Bohr", "B. Isaac Newton", "C. Albert Einstein", "D. Galileo Galilei"],
@@ -102,34 +101,12 @@ let selectedLevel = [];
 let currentQuestionIndex = 0;
 let correctAnswers = 0;
 
-// Function to display countdown timer
-function countdown(seconds) {
-  let timeLeft = seconds;
-  interval = setInterval(() => {
-    if (!questionAnswered) {
-      process.stdout.write('\x1B[2K'); // Clear the current line
-      process.stdout.write(`\x1B[0GTime left: ${timeLeft}s `); // Timer display with space
-      timeLeft--;
-      if (timeLeft < 0) {
-        clearInterval(interval);
-        process.stdout.write('\nTime\'s up!\n');
-        handleAnswer(""); // Automatically handle as skipped
-      }
-    }
-  }, 1000);
-}
-
 // Function to handle the user's answer
 function handleAnswer(answer) {
-  questionAnswered = true;
-  clearInterval(interval);
-
   const validOptions = ['A', 'B', 'C', 'D'];
   const correctOption = selectedLevel[currentQuestionIndex].answer;
 
-  if (answer === "") {
-    console.log(`Skipped! Correct answer: ${correctOption}`);
-  } else if (!validOptions.includes(answer.toUpperCase())) {
+  if (!validOptions.includes(answer.toUpperCase())) {
     invalidAttempts++;
     if (invalidAttempts >= MAX_INVALID_ATTEMPTS) {
       console.log("Too many invalid inputs! Game over.");
@@ -156,17 +133,14 @@ function handleAnswer(answer) {
 
 // Function to ask the next question
 function askNextQuestion() {
-  questionAnswered = false;
   const currentQuestion = selectedLevel[currentQuestionIndex];
   const { question, options } = currentQuestion;
 
   console.log(`\n${question}`);
   options.forEach(option => console.log(option));
 
-  // Print prompt and start countdown
+  // Prompt for user input
   console.log("\nYour choice (A, B, C, D): ");
-  countdown(10); // Start countdown for 10 seconds
-
   rl.question('', (answer) => {
     console.log(`\nEntered choice: ${answer}`);
     handleAnswer(answer);
