@@ -9,38 +9,94 @@ const rl = readline.createInterface({
 let interval;
 let questionAnswered = false; // Track if the question was answered or skipped
 
-// Questions and answers
-const questions = [
-  {
-    question: "What is the capital of France?",
-    options: ["A. Paris", "B. London", "C. Rome", "D. Madrid"],
-    answer: "A" // Correct answer
-  },
-  {
-    question: "What is the largest planet in our Solar System?",
-    options: ["A. Earth", "B. Mars", "C. Jupiter", "D. Saturn"],
-    answer: "C" // Correct answer
-  },
-  {
-    question: "Who wrote 'To Kill a Mockingbird'?",
-    options: ["A. Harper Lee", "B. J.K. Rowling", "C. Mark Twain", "D. Ernest Hemingway"],
-    answer: "A" // Correct answer
-  },
-  {
-    question: "What is the chemical symbol for water?",
-    options: ["A. H2O", "B. CO2", "C. NaCl", "D. O2"],
-    answer: "A" // Correct answer
-  },
-  {
-    question: "Who was the first president of the United States?",
-    options: ["A. Abraham Lincoln", "B. George Washington", "C. John Adams", "D. Thomas Jefferson"],
-    answer: "B" // Correct answer
-  }
+// Questions and answers for each difficulty level
+const levels = {
+  easy: [
+    {
+      question: "What is the capital of France?",
+      options: ["A. Paris", "B. London", "C. Rome", "D. Madrid"],
+      answer: "A" // Correct answer
+    },
+    {
+      question: "What is the largest planet in our Solar System?",
+      options: ["A. Earth", "B. Mars", "C. Jupiter", "D. Saturn"],
+      answer: "C" // Correct answer
+    },
+    {
+      question: "Who is the author of the Harry Potter book series??",
+      options: ["A. Harper Lee", "B. J.K. Rowling", "C. Mark Twain", "D. Ernest Hemingway"],
+      answer: "B" // Correct answer
+    },
+    {
+      question: "What is the chemical symbol for water?",
+      options: ["A. H2O", "B. CO2", "C. NaCl", "D. O2"],
+      answer: "A" // Correct answer
+    },
+    {
+      question: "Who was the first president of the United States?",
+      options: ["A. Abraham Lincoln", "B. George Washington", "C. John Adams", "D. Thomas Jefferson"],
+      answer: "B" // Correct answer
+    }
+  ],
+  medium: [
+    {
+      question: "What is the currency in China??",
+      options: ["A. Yen", "B. Won", "C. Renminbi Yuan", "D. Baht"],
+      answer: "C" // Correct answer
+    },
+    {
+      question: "Which element has the chemical symbol 'K'?",
+      options: ["A. Krypton", "B. Potassium", "C. Calcium", "D. Iron"],
+      answer: "B" // Correct answer
+    },
+    {
+      question: "Who created the Monalisa painting?",
+      options: ["A. Leonardo da Vinci", "B. Michelangelo", "C. Raphael", "D. Vincent van Gogh"],
+      answer: "A" // Correct answer
+    },
+    {
+      question: "What is the smallest country in the world by land area??",
+      options: ["A. Monaco", "B. Liechtenstein", "C. San Marino", "D. Vatican City"],
+      answer: "D" // Correct answer
+    },
+    {
+      question: "Which planet is known as the Morning Star or Evening Star?",
+      options: ["A. Venus", "B. Mars", "C. Jupiter", "D. Mercury"],
+      answer: "A" // Correct answer
+    }
 
-  // Add more questions as needed
-];
+    
+  ],
+  high: [
+    {
+      question: "Who is credited with developing the general theory of relativity?",
+      options: ["A. Niels Bohr", "B. Isaac Newton", "C. Albert Einstein", "D. Galileo Galilei"],
+      answer: "C" // Correct answer
+    },
+    {
+      question: "Alexander the great was ruler of which kingdom?",
+      options: ["A. Persia", "B. Macedonia", "C. Rome", "D. Egypt"],
+      answer: "B" // Correct answer
+    },
+    {
+      question: "What is the longest river in the world?",
+      options: ["A. Amazon", "B. Yangtze", "C. Missisippi", "D. Nile"],
+      answer: "D" // Correct answer
+    },
+    {
+      question: "Who was the British Prime Minister during World War I?",
+      options: ["A. David Lloyd George", "B. Neville Chamberlain", "C. Winston Churchill", "D. Herbert Asquith"],
+      answer: "A" // Correct answer
+    },
+    {
+      question: "Which among these is not an sub-atomic particle?",
+      options: ["A. Proton", "B. Neutron", "C. Electron", "D. Photon"],
+      answer: "D" // Correct answer
+    }
+  ]
+};
 
-const totalQuestions = questions.length;
+let selectedLevel = [];
 let currentQuestionIndex = 0;
 let correctAnswers = 0;
 
@@ -65,18 +121,18 @@ function countdown(seconds) {
 function handleAnswer(answer) {
   questionAnswered = true;
   clearInterval(interval);
-  const correctOption = questions[currentQuestionIndex].answer;
+  const correctOption = selectedLevel[currentQuestionIndex].answer;
   if (answer.toUpperCase() === correctOption) {
     console.log("Correct!");
     correctAnswers++;
   } else if (answer === "") {
-    console.log("Skipped!");
+    console.log(`Skipped! Correct answer: ${correctOption}`);
   } else {
-    console.log("Incorrect!");
+    console.log(`Incorrect! Correct answer: ${correctOption}`);
   }
 
   currentQuestionIndex++;
-  if (currentQuestionIndex < totalQuestions) {
+  if (currentQuestionIndex < selectedLevel.length) {
     askNextQuestion();
   } else {
     endGame();
@@ -86,7 +142,7 @@ function handleAnswer(answer) {
 // Function to ask the next question
 function askNextQuestion() {
   questionAnswered = false;
-  const currentQuestion = questions[currentQuestionIndex];
+  const currentQuestion = selectedLevel[currentQuestionIndex];
   const { question, options } = currentQuestion;
 
   // Clear the line before printing the new question
@@ -108,12 +164,30 @@ function askNextQuestion() {
 // Function to end the game
 function endGame() {
   if (correctAnswers >= 4) {
-    console.log(`\nCongratulations! You answered ${correctAnswers} out of ${totalQuestions} questions correctly. You win!`);
+    console.log(`\nCongratulations! You answered ${correctAnswers} out of ${selectedLevel.length} questions correctly. You win!`);
   } else {
-    console.log(`\nYou answered ${correctAnswers} out of ${totalQuestions} questions correctly. You lose!`);
+    console.log(`\nYou answered ${correctAnswers} out of ${selectedLevel.length} questions correctly. You lose!`);
   }
   rl.close();
 }
 
-// Start the game
-askNextQuestion();
+// Function to select difficulty level
+function selectLevel() {
+  console.log("\nSelect difficulty level:\n1. Easy\n2. Medium\n3. High");
+  rl.question("Enter your choice (1-3): ", (choice) => {
+    if (choice === "1") {
+      selectedLevel = levels.easy;
+    } else if (choice === "2") {
+      selectedLevel = levels.medium;
+    } else if (choice === "3") {
+      selectedLevel = levels.high;
+    } else {
+      console.log("Invalid choice, please try again.");
+      return selectLevel();
+    }
+    askNextQuestion();
+  });
+}
+
+// Start the game by selecting difficulty level
+selectLevel();
