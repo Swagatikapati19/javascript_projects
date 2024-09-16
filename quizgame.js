@@ -8,6 +8,10 @@ const rl = readline.createInterface({
 
 let interval;
 let questionAnswered = false; // Track if the question was answered or skipped
+let invalidAttempts = 0; // Track the number of invalid inputs
+
+// Max allowed invalid attempts
+const MAX_INVALID_ATTEMPTS = 3;
 
 // Questions and answers for each difficulty level
 const levels = {
@@ -23,7 +27,7 @@ const levels = {
       answer: "C" // Correct answer
     },
     {
-      question: "Who is the author of the Harry Potter book series??",
+      question: "Who is the author of the Harry Potter book series?",
       options: ["A. Harper Lee", "B. J.K. Rowling", "C. Mark Twain", "D. Ernest Hemingway"],
       answer: "B" // Correct answer
     },
@@ -40,7 +44,7 @@ const levels = {
   ],
   medium: [
     {
-      question: "What is the currency in China??",
+      question: "What is the currency in China?",
       options: ["A. Yen", "B. Won", "C. Renminbi Yuan", "D. Baht"],
       answer: "C" // Correct answer
     },
@@ -50,12 +54,12 @@ const levels = {
       answer: "B" // Correct answer
     },
     {
-      question: "Who created the Monalisa painting?",
+      question: "Who created the Mona Lisa painting?",
       options: ["A. Leonardo da Vinci", "B. Michelangelo", "C. Raphael", "D. Vincent van Gogh"],
       answer: "A" // Correct answer
     },
     {
-      question: "What is the smallest country in the world by land area??",
+      question: "What is the smallest country in the world by land area?",
       options: ["A. Monaco", "B. Liechtenstein", "C. San Marino", "D. Vatican City"],
       answer: "D" // Correct answer
     },
@@ -64,8 +68,6 @@ const levels = {
       options: ["A. Venus", "B. Mars", "C. Jupiter", "D. Mercury"],
       answer: "A" // Correct answer
     }
-
-    
   ],
   high: [
     {
@@ -74,13 +76,13 @@ const levels = {
       answer: "C" // Correct answer
     },
     {
-      question: "Alexander the great was ruler of which kingdom?",
+      question: "Alexander the Great was ruler of which kingdom?",
       options: ["A. Persia", "B. Macedonia", "C. Rome", "D. Egypt"],
       answer: "B" // Correct answer
     },
     {
       question: "What is the longest river in the world?",
-      options: ["A. Amazon", "B. Yangtze", "C. Missisippi", "D. Nile"],
+      options: ["A. Amazon", "B. Yangtze", "C. Mississippi", "D. Nile"],
       answer: "D" // Correct answer
     },
     {
@@ -89,7 +91,7 @@ const levels = {
       answer: "A" // Correct answer
     },
     {
-      question: "Which among these is not an sub-atomic particle?",
+      question: "Which among these is not a sub-atomic particle?",
       options: ["A. Proton", "B. Neutron", "C. Electron", "D. Photon"],
       answer: "D" // Correct answer
     }
@@ -121,12 +123,25 @@ function countdown(seconds) {
 function handleAnswer(answer) {
   questionAnswered = true;
   clearInterval(interval);
+
+  const validOptions = ['A', 'B', 'C', 'D'];
   const correctOption = selectedLevel[currentQuestionIndex].answer;
-  if (answer.toUpperCase() === correctOption) {
+
+  if (answer === "") {
+    console.log(`Skipped! Correct answer: ${correctOption}`);
+  } else if (!validOptions.includes(answer.toUpperCase())) {
+    invalidAttempts++;
+    if (invalidAttempts >= MAX_INVALID_ATTEMPTS) {
+      console.log("Too many invalid inputs! Game over.");
+      rl.close(); // End the game
+      return;
+    }
+    console.log(`Invalid input, please select from options A-D only. (${invalidAttempts}/${MAX_INVALID_ATTEMPTS})`);
+    askNextQuestion(); // Ask the question again without advancing
+    return;
+  } else if (answer.toUpperCase() === correctOption) {
     console.log("Correct!");
     correctAnswers++;
-  } else if (answer === "") {
-    console.log(`Skipped! Correct answer: ${correctOption}`);
   } else {
     console.log(`Incorrect! Correct answer: ${correctOption}`);
   }
@@ -145,8 +160,6 @@ function askNextQuestion() {
   const currentQuestion = selectedLevel[currentQuestionIndex];
   const { question, options } = currentQuestion;
 
-  // Clear the line before printing the new question
-  process.stdout.write('\x1B[2K'); // Clear the current line
   console.log(`\n${question}`);
   options.forEach(option => console.log(option));
 
@@ -155,8 +168,7 @@ function askNextQuestion() {
   countdown(10); // Start countdown for 10 seconds
 
   rl.question('', (answer) => {
-    // Move cursor to the next line and print entered choice
-    process.stdout.write(`\nEntered choice: ${answer}\n`);
+    console.log(`\nEntered choice: ${answer}`);
     handleAnswer(answer);
   });
 }
