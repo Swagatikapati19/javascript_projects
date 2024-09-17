@@ -1,0 +1,17 @@
+{
+    "name": "js-browser",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "inquirer": "^10.2.2",
+        "prompt-sync": "^4.2.0",
+        "readline-sync": "^1.4.10"
+    }
+}
